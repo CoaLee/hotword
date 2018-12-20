@@ -1,5 +1,6 @@
 from konlpy.tag import Twitter
 from collections import Counter
+from operator import eq
 
 # 단어구름에 필요한 라이브러리를 불러옵니다.
 import numpy as np
@@ -24,6 +25,12 @@ def get_tags(text, ntags=50):
     nouns_c = []
     for i in nouns:
         if len(i)==1:
+            continue
+        elif eq(i, "뉴스"):
+            continue
+        elif eq(i, "기자"):
+            continue
+        elif eq(i, "제공"):
             continue
         nouns_c.append(i)
 
@@ -66,7 +73,7 @@ def make_cloud_image(tags, output_name):
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
     # plt.show()
-    fig.savefig(output_name+".png")
+    fig.savefig("img_wordcloud/{0}.png".format(output_name))
 
 def process_main(text_file_name):
 # def process_main():
