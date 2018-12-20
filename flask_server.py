@@ -2,12 +2,13 @@ from flask import Flask, request, make_response, jsonify
 from slacker import Slacker
 import requests, json
 from slackclient import SlackClient
+import process
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 # 슬랙 토큰으로 객체 생성
-token = "xoxb-503818135714-509602121223-xBDZOPzJ76fRRVmnAHDaYquv"
+token = "xoxb-503818135714-509602121223-JU7TqOGdGsI4JwufhOOAldJw"
 slack_verification = "869x6D9L8QjN08ciUCRnyodW"
 slack = Slacker(token)
 sc = SlackClient(token)
@@ -48,24 +49,31 @@ def _event_handler(event_type, slack_event):
         speech = result_df['speech']
         intent = result_df['intent']
 
-        if intent == 'category_society':
+        result_process = " result "
+        print(intent)
+        if intent in ['category', 'category_society']:
             result_process = _call_process()
+            print(result_process)
 
-        #slack.chat.post_message(channel, '{0}\n\n{1}'.format(speech, result_process))
-
+        process.process_main("category_society")
+        slack.chat.post_message(channel, '{0}\n\n{1}'.format(speech, result_process))
+        slack.files.upload('category_society.png', channels=channel)
+        '''
         sc.api_call(
             "chat.postMessage",
             channel=channel,
             text='{0}\n\n{1}'.format(speech, result_process)
         )
+        '''
+        print('{0}\n\n{1}'.format(speech, result_process))
 
         return make_response("App mention message has been sent", 200)
-
-    # ============= Event Type Not Found! ============= #
-    # If the event_type does not have a handler
-    message = "You have not added an event handler for the %s" % event_type
-    # Return a helpful error message
-    return make_response(message, 200, {"X-Slack-No-Retry": 1})
+    else :
+        # ============= Event Type Not Found! ============= #
+        # If the event_type does not have a handler
+        message = "You have not added an event handler for the %s" % event_type
+        # Return a helpful error message
+        return make_response(message, 200, {"X-Slack-No-Retry": 1})
 
 def _get_answer_from_DF(slack_msg, user_key):
     data_send = {
