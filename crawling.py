@@ -32,38 +32,42 @@ def make_txt_crawling(url,category):
 
     list_href = []
     list_content = []
+    texttt = ""
     # 페이지 href 찾는부분
-    for i in range(1, 2):
+    for i in range(1, 3):
         urls = url + str(i)
         soup = BeautifulSoup(urllib.request.urlopen(urls).read(), "html.parser")
         for ul_tags in soup.find_all("ul", class_='list_news2 list_allnews'):
-            for div_tags in ul_tags.find_all("div", class_="cont_thumb"):
-                for a_tags in div_tags.find_all("a"):
+                for a_tags in ul_tags.find_all("a", class_='link_txt'):
                     list_href.append(a_tags["href"])
-
+    print(list_href)
     # href에 있는 내용 부분 크롤링
     for urls in list_href:
         soup = BeautifulSoup(urllib.request.urlopen(urls).read(), "html.parser")
-        for content in soup.find_all("p"):
+        for content in soup.find_all("section"):
             list_content.append(content.get_text())
 
+
+    print("d")
     # list -> 문자열로 바꿈
     text = ""
     for i in list_content:
         text += i
     # 문장을 -> 각 단어로
-    words = text.split()
 
-    keywords = []
-    for i in words:
-        if len(i) >= 2:
-            keywords.append(i)
+    #words = text.split()
 
-    text2 = ""
-    for i in keywords:
-        text2 += i + " "
+    #keywords = []
+    # for i in words:
+    #     if len(i) >= 2:
+    #         keywords.append(i)
+    #
+    # text2 = ""
+    # for i in keywords:
+    #     text2 += i + " "
 
     fw = open(category+".txt", 'w', -1, "utf-8")
-    fw.write(text2)
+    fw.write(text)
     fw.close()
 
+#crawling('category_society')

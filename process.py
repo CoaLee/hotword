@@ -12,6 +12,9 @@ from matplotlib import font_manager, rc
 '''
     데이터 받아서 가공하는 함수
 '''
+# 폰트 설정
+font_path = 'NanumGothic.ttf'
+
 def get_tags(text, ntags=50):
     spliter = Twitter()
     # konlpy의 Twitter객체
@@ -27,6 +30,7 @@ def get_tags(text, ntags=50):
     # nouns 함수를 통해서 text에서 명사만 분리/추출
     count = Counter(nouns_c)
     # Counter객체를 생성하고 참조변수 nouns할당
+
     return_dic = {}  # 명사 빈도수 저장할 변수
     for n, c in count.most_common(ntags):
         return_dic[n] = c
@@ -37,7 +41,7 @@ def get_tags(text, ntags=50):
     # 명사와 사용된 갯수를 return_list에 저장합니다.
     return return_dic
 
-def make_cloud_image(tags):
+def make_cloud_image(tags, output_name):
     '''
     wordcloud 패키지를 이용해 트럼프 대통령 실루엣 모양의 단어구름을 생성합니다.
     '''
@@ -47,18 +51,28 @@ def make_cloud_image(tags):
     #         data=line.split()
     #         word, count = data[0], float(data[1])
     #         word_to_count[word] = count
-    print(tags)
-    trump_mask = np.array(Image.open('trump.png'))
-    cloud = WordCloud(background_color='white', mask=trump_mask)
-    cloud.fit_words(tags)
-    cloud.to_file('cloud.png')
+    # mask = np.array(Image.open("trump.png"))
+
+    wordcloud = WordCloud(
+        font_path=font_path,
+        width=800,
+        height=800,
+        background_color="white",
+        # mask= mask
+    )
+
+    wordcloud = wordcloud.generate_from_frequencies(tags)
+    fig = plt.figure(figsize=(10, 10))
+    plt.imshow(wordcloud, interpolation="bilinear")
+    plt.axis("off")
+    # plt.show()
+    fig.savefig(output_name+".png")
 
 def process_main(text_file_name):
-    # font_name = font_manager.FontProperties("NanumGothic.ttf").get_name()
-    # rc('font', family=font_name)
-    # text_file_name = "test.txt"
+# def process_main():
+    # text_file_name = "test"
     # 분석할 파일
-    noun_count = 30
+    noun_count = 150
     # 최대 많은 빈도수 부터 30개 명사 추출
     output_file_name = text_file_name+"_result.txt"
     # count.txt 에 저장
@@ -68,18 +82,18 @@ def process_main(text_file_name):
     tags = get_tags(text, noun_count)  # get_tags 함수 실행
     open_text_file.close()  # 파일 close
     # print(tags)
-    open_output_file = open(output_file_name, 'w', -1, "utf-8")
-    # 결과로 쓰일 count.txt 열기
-    for tag in tags:
-        noun = tag['tag']
-        count = tag['count']
-        open_output_file.write('{} {}\n'.format(noun, count))
-    # 결과 저장
-    open_output_file.close()
+    # open_output_file = open(output_file_name, 'w', -1, "utf-8")
+    # # 결과로 쓰일 count.txt 열기
+    # for tag in tags:
+    #     noun = tag['tag']
+    #     count = tag['count']
+    #     open_output_file.write('{} {}\n'.format(noun, count))
+    # # 결과 저장
+    # open_output_file.close()
    
     # cloud 이미지로 만들기
-    # make_cloud_image(tags)
+    make_cloud_image(tags, text_file_name)
 
 # if __name__ == '__main__':
-#     main()
+#     process_main()
 
