@@ -8,10 +8,9 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 # 슬랙 토큰으로 객체 생성
-token = "xoxb-503818135714-509602121223-LlNJGkwP4qus4pFsP2C1CcH4"
+token = "xoxb-503818135714-509602121223-auRwFdm1kaQ29b5GjF4P5Fue"
 slack_verification = "869x6D9L8QjN08ciUCRnyodW"
 slack = Slacker(token)
-sc = SlackClient(token)
 
 @app.route('/')
 def index():
@@ -65,20 +64,12 @@ def _event_handler(event_type, slack_event):
         }
 
         if intent in ['category']:
-            result_process = _call_process()
+            if keyword in category_dict:
+                category_name = "category_{0}".format(category_dict[keyword])
+                process.process_main(category_name)
 
-            category_name = "category_{0}".format(category_dict[keyword])
-            process.process_main(category_name)
-
-            slack.chat.post_message(channel, '{0}\n\n{1}'.format(speech, result_process))
-            slack.files.upload('img_wordcloud/{0}.png'.format(category_name), channels=channel)
-            '''
-            sc.api_call(
-                "chat.postMessage",
-                channel=channel,
-                text='{0}\n\n{1}'.format(speech, result_process)
-            )
-            '''
+                slack.chat.post_message(channel, speech)
+                slack.files.upload('img_wordcloud/{0}.png'.format(category_name), channels=channel)
         # print('{0}\n\n{1}'.format(speech, result_process))
 
         return make_response("App mention message has been sent", 200)
@@ -117,13 +108,6 @@ def _get_answer_from_DF(slack_msg, user_key):
 
     return result
 
-# Wrapper
-def _call_crawler():
-    return "crawler called"
-
-# Wrapper
-def _call_process():
-    return _call_crawler() + "->" + "process processed"
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0')
