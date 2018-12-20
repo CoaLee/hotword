@@ -25,7 +25,7 @@ def crawling(category):
     elif category.find('category_editorial') != -1:
         make_txt_crawling("https://media.daum.net/breakingnews/editorial?page=",category)
     elif category.find('category_press') != -1:
-        make_txt_crawling("https://media.daum.net/breakingnews/press?page=5",category)
+        make_txt_crawling("https://media.daum.net/breakingnews/press?page=",category)
 
 
 def make_txt_crawling(url,category):
@@ -34,7 +34,7 @@ def make_txt_crawling(url,category):
     list_content = []
     texttt = ""
     # 페이지 href 찾는부분
-    for i in range(1, 3):
+    for i in range(1, 10):
         urls = url + str(i)
         soup = BeautifulSoup(urllib.request.urlopen(urls).read(), "html.parser")
         for ul_tags in soup.find_all("ul", class_='list_news2 list_allnews'):
@@ -70,4 +70,13 @@ def make_txt_crawling(url,category):
     fw.write(text)
     fw.close()
 
-#crawling('category_society')
+crawling('category_society')
+crawling('category_politics')
+crawling('category_economic')
+crawling('category_foreign')
+crawling('category_culture')
+crawling('category_entertain')
+crawling('category_digital')
+crawling('category_sports')
+crawling('category_editorial')
+crawling('category_press')
