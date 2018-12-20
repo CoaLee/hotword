@@ -2,6 +2,7 @@ from flask import Flask, request, make_response, jsonify
 from slacker import Slacker
 import requests, json
 from slackclient import SlackClient
+import process
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
@@ -54,8 +55,9 @@ def _event_handler(event_type, slack_event):
             result_process = _call_process()
             print(result_process)
 
+        process.process_main("category_society")
         slack.chat.post_message(channel, '{0}\n\n{1}'.format(speech, result_process))
-        slack.files.upload('icon.png', channels=channel)
+        slack.files.upload('category_society.png', channels=channel)
         '''
         sc.api_call(
             "chat.postMessage",

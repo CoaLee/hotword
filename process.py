@@ -76,7 +76,7 @@ def process_main(text_file_name):
     # 최대 많은 빈도수 부터 30개 명사 추출
     output_file_name = text_file_name+"_result.txt"
     # count.txt 에 저장
-    open_text_file = open(text_file_name+".txt", 'r', -1, "utf-8")
+    open_text_file = open("category\\" + text_file_name+".txt", 'r', -1, "utf-8")
     # 분석할 파일을 open
     text = open_text_file.read()  # 파일을 읽습니다.
     tags = get_tags(text, noun_count)  # get_tags 함수 실행
