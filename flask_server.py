@@ -46,6 +46,7 @@ def _event_handler(event_type, slack_event):
 
         result_df = _get_answer_from_DF(text[13:], 'random_session')
 
+        print(type(result_df))
         speech = result_df['speech']
         intent = result_df['intent']
 
