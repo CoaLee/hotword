@@ -66,7 +66,7 @@ def make_cloud_image(tags, output_name):
     plt.imshow(wordcloud, interpolation="bilinear")
     plt.axis("off")
     # plt.show()
-    fig.savefig(output_name+".png")
+    fig.savefig("img_wordcloud/{0}.png".format(output_name))
 
 def process_main(text_file_name):
 # def process_main():

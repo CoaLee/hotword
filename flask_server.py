@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 # 슬랙 토큰으로 객체 생성
-token = "xoxb-503818135714-509602121223-JU7TqOGdGsI4JwufhOOAldJw"
+token = "xoxb-503818135714-509602121223-LlNJGkwP4qus4pFsP2C1CcH4"
 slack_verification = "869x6D9L8QjN08ciUCRnyodW"
 slack = Slacker(token)
 sc = SlackClient(token)
@@ -46,27 +46,40 @@ def _event_handler(event_type, slack_event):
 
         result_df = _get_answer_from_DF(text[13:], 'random_session')
 
-        print(type(result_df))
+
         speech = result_df['speech']
         intent = result_df['intent']
+        keyword = result_df['keyword']
 
-        result_process = " result "
-        print(intent)
-        if intent in ['category', 'category_society']:
+        category_dict = {
+            "사회": "society",
+            "정치": "politics",
+            "경제": "economic",
+            "국제": "foreign",
+            "문화": "culture",
+            "연예": "entertain",
+            "스포츠": "sports",
+            "IT": "digital",
+            "칼럼": "editorial",
+            "보도자료": "press"
+        }
+
+        if intent in ['category']:
             result_process = _call_process()
-            print(result_process)
 
-        process.process_main("category_society")
-        slack.chat.post_message(channel, '{0}\n\n{1}'.format(speech, result_process))
-        slack.files.upload('category_society.png', channels=channel)
-        '''
-        sc.api_call(
-            "chat.postMessage",
-            channel=channel,
-            text='{0}\n\n{1}'.format(speech, result_process)
-        )
-        '''
-        print('{0}\n\n{1}'.format(speech, result_process))
+            category_name = "category_{0}".format(category_dict[keyword])
+            process.process_main(category_name)
+
+            slack.chat.post_message(channel, '{0}\n\n{1}'.format(speech, result_process))
+            slack.files.upload('img_wordcloud/{0}.png'.format(category_name), channels=channel)
+            '''
+            sc.api_call(
+                "chat.postMessage",
+                channel=channel,
+                text='{0}\n\n{1}'.format(speech, result_process)
+            )
+            '''
+        # print('{0}\n\n{1}'.format(speech, result_process))
 
         return make_response("App mention message has been sent", 200)
     else :
@@ -95,9 +108,11 @@ def _get_answer_from_DF(slack_msg, user_key):
         return '오류가 발생했습니다.'
 
     data_receive = res.json()
+    print(data_receive.items())
     result = {
         "speech": data_receive['result']['fulfillment']['speech'],
-        "intent": data_receive['result']['metadata']['intentName']
+        "intent": data_receive['result']['metadata']['intentName'],
+        "keyword": data_receive['result']['parameters']['any']
     }
 
     return result
