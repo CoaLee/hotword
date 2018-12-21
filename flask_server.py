@@ -2,13 +2,13 @@ from flask import Flask, request, make_response, jsonify
 from slacker import Slacker
 import requests, json
 from slackclient import SlackClient
-import process
+import process, crawling
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 # 슬랙 토큰으로 객체 생성
-token = "xoxb-503818135714-509602121223-auRwFdm1kaQ29b5GjF4P5Fue"
+token = "xoxb-503818135714-509602121223-fTOD60tiu26We4Xd5Km6WGPX"
 slack_verification = "869x6D9L8QjN08ciUCRnyodW"
 slack = Slacker(token)
 
@@ -45,32 +45,29 @@ def _event_handler(event_type, slack_event):
 
         result_df = _get_answer_from_DF(text[13:], 'random_session')
 
-
         speech = result_df['speech']
         intent = result_df['intent']
-        keyword = result_df['keyword']
+        if 'keyword' in result_df:
+            keyword = result_df['keyword']
 
-        category_dict = {
-            "사회": "society",
-            "정치": "politics",
-            "경제": "economic",
-            "국제": "foreign",
-            "문화": "culture",
-            "연예": "entertain",
-            "스포츠": "sports",
-            "IT": "digital",
-            "칼럼": "editorial",
-            "보도자료": "press"
-        }
+        # 다음 뉴스 카테고리와 영문(url주소)명
+        category_dict = {"사회": "society", "정치": "politics", "경제": "economic", "국제": "foreign",
+            "문화": "culture", "연예": "entertain", "스포츠": "sports", "IT": "digital", "칼럼": "editorial",
+            "보도자료": "press"}
 
-        if intent in ['category']:
+        if intent == 'category':
+            # 카테고리 검색 -> 다음 뉴스 카테고리 검색
             if keyword in category_dict:
                 category_name = "category_{0}".format(category_dict[keyword])
                 process.process_main(category_name)
 
                 slack.chat.post_message(channel, speech)
                 slack.files.upload('img_wordcloud/{0}.png'.format(category_name), channels=channel)
-        # print('{0}\n\n{1}'.format(speech, result_process))
+            # 키워드 검색 -> 조선일보 검색 결과
+            else:
+                process.process_search(keyword)
+                slack.chat.post_message(channel, speech)
+                slack.files.upload('img_wordcloud/keyword_result.png', channels=channel)
 
         return make_response("App mention message has been sent", 200)
     else :
@@ -103,8 +100,10 @@ def _get_answer_from_DF(slack_msg, user_key):
     result = {
         "speech": data_receive['result']['fulfillment']['speech'],
         "intent": data_receive['result']['metadata']['intentName'],
-        "keyword": data_receive['result']['parameters']['any']
+
     }
+    if 'any' in data_receive['result']['parameters']:
+        result["keyword"] = data_receive['result']['parameters']['any']
 
     return result
 

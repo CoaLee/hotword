@@ -1,6 +1,7 @@
 from konlpy.tag import Twitter
 from collections import Counter
 from operator import eq
+import crawling
 
 # 단어구름에 필요한 라이브러리를 불러옵니다.
 import numpy as np
@@ -100,6 +101,59 @@ def process_main(text_file_name):
    
     # cloud 이미지로 만들기
     make_cloud_image(tags, text_file_name)
+
+
+def process_search(keyword):
+    # def process_main():
+    # text_file_name = "test"
+    # 분석할 파일
+    noun_count = 150
+    # 최대 많은 빈도수 부터 30개 명사 추출
+    output_file_name = keyword + "_result.txt"
+    # count.txt 에 저장
+
+    text = crawling.search_crawling(keyword) # 파일을 읽습니다.
+    tags = get_tags(text, noun_count)  # get_tags 함수 실행
+    # print(tags)
+    # open_output_file = open(output_file_name, 'w', -1, "utf-8")
+    # # 결과로 쓰일 count.txt 열기
+    # for tag in tags:
+    #     noun = tag['tag']
+    #     count = tag['count']
+    #     open_output_file.write('{} {}\n'.format(noun, count))
+    # # 결과 저장
+    # open_output_file.close()
+
+    # cloud 이미지로 만들기
+    make_cloud_image_search(tags, keyword)
+
+def make_cloud_image_search(tags, output_name):
+    '''
+    wordcloud 패키지를 이용해 트럼프 대통령 실루엣 모양의 단어구름을 생성합니다.
+    '''
+    # word_to_count = {}
+    # with open(tags_file) as file:
+    #     for line in file:
+    #         data=line.split()
+    #         word, count = data[0], float(data[1])
+    #         word_to_count[word] = count
+    # mask = np.array(Image.open("trump.png"))
+
+    wordcloud = WordCloud(
+        font_path=font_path,
+        width=800,
+        height=800,
+        background_color="white",
+        # mask= mask
+    )
+
+    wordcloud = wordcloud.generate_from_frequencies(tags)
+    fig = plt.figure(figsize=(10, 10))
+    plt.imshow(wordcloud, interpolation="bilinear")
+    plt.axis("off")
+    # plt.show()
+    fig.savefig("img_wordcloud/{0}.png".format('keyword_result'))
+
 
 # if __name__ == '__main__':
 #     process_main()

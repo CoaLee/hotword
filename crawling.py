@@ -114,4 +114,3 @@ def search_crawling(word):
     text = " ".join(list_content)
 
     return text
-
