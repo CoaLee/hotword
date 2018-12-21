@@ -1,3 +1,5 @@
 .idea
 __pycache__
 img_wordcloud
+my_slack_info.py
+

@@ -1,15 +1,19 @@
-from flask import Flask, request, make_response, jsonify
+from flask import Flask, request, make_response
 from slacker import Slacker
 import requests, json
-from slackclient import SlackClient
-import process, crawling
+import process
+import my_slack_info
+
+# 멀티스레드 라이브러리
+import multiprocessing as mp
+from threading import Thread
 
 app = Flask(__name__)
 app.config['JSON_AS_ASCII'] = False
 
 # 슬랙 토큰으로 객체 생성
-token = "xoxb-503818135714-509602121223-fTOD60tiu26We4Xd5Km6WGPX"
-slack_verification = "869x6D9L8QjN08ciUCRnyodW"
+token = my_slack_info.token
+slack_verification = my_slack_info.slack_verification
 slack = Slacker(token)
 
 @app.route('/')
@@ -40,35 +44,7 @@ def listening():
 
 def _event_handler(event_type, slack_event):
     if event_type == "app_mention":
-        channel = slack_event["event"]["channel"]
-        text = slack_event["event"]["text"]
-
-        result_df = _get_answer_from_DF(text[13:], 'random_session')
-
-        speech = result_df['speech']
-        intent = result_df['intent']
-        if 'keyword' in result_df:
-            keyword = result_df['keyword']
-
-        # 다음 뉴스 카테고리와 영문(url주소)명
-        category_dict = {"사회": "society", "정치": "politics", "경제": "economic", "국제": "foreign",
-            "문화": "culture", "연예": "entertain", "스포츠": "sports", "IT": "digital", "칼럼": "editorial",
-            "보도자료": "press"}
-
-        if intent == 'category':
-            # 카테고리 검색 -> 다음 뉴스 카테고리 검색
-            if keyword in category_dict:
-                category_name = "category_{0}".format(category_dict[keyword])
-                process.process_main(category_name)
-
-                slack.chat.post_message(channel, speech)
-                slack.files.upload('img_wordcloud/{0}.png'.format(category_name), channels=channel)
-            # 키워드 검색 -> 조선일보 검색 결과
-            else:
-                process.process_search(keyword)
-                slack.chat.post_message(channel, speech)
-                slack.files.upload('img_wordcloud/keyword_result.png', channels=channel)
-
+        event_queue.put(slack_event)
         return make_response("App mention message has been sent", 200)
     else :
         # ============= Event Type Not Found! ============= #
@@ -76,6 +52,43 @@ def _event_handler(event_type, slack_event):
         message = "You have not added an event handler for the %s" % event_type
         # Return a helpful error message
         return make_response(message, 200, {"X-Slack-No-Retry": 1})
+
+def _processing_event(queue):
+    while True:
+        if not queue.empty():
+            slack_event = queue.get()
+            channel = slack_event["event"]["channel"]
+            text = slack_event["event"]["text"]
+
+            result_df = _get_answer_from_DF(text[13:], 'random_session')
+
+            speech = result_df['speech']
+            intent = result_df['intent']
+            if 'keyword' in result_df:
+                keyword = result_df['keyword']
+
+            # 다음 뉴스 카테고리와 영문(url주소)명
+            category_dict = {"사회": "society", "정치": "politics", "경제": "economic", "국제": "foreign",
+                             "문화": "culture", "연예": "entertain", "스포츠": "sports", "IT": "digital", "칼럼": "editorial",
+                             "보도자료": "press"}
+
+            if intent == 'category':
+                # 카테고리 검색 -> 다음 뉴스 카테고리 검색
+                if keyword in category_dict:
+                    category_name = "category_{0}".format(category_dict[keyword])
+                    process.process_main(category_name)
+
+                    slack.chat.post_message(channel, speech)
+                    slack.files.upload('img_wordcloud/{0}.png'.format(category_name), channels=channel)
+                # 키워드 검색 -> 조선일보 검색 결과
+                else:
+                    result_code = process.process_search(keyword)
+                    print("result_code: {}".format(result_code))
+                    if result_code == -1:
+                        slack.chat.post_message(channel, "{0} 기사가 없습니다.".format(keyword))
+                    else:
+                        slack.chat.post_message(channel, speech)
+                        slack.files.upload('img_wordcloud/keyword_result.png', channels=channel)
 
 def _get_answer_from_DF(slack_msg, user_key):
     data_send = {
@@ -107,9 +120,14 @@ def _get_answer_from_DF(slack_msg, user_key):
 
     return result
 
-
 if __name__ == '__main__':
+    event_queue = mp.Queue()
+    p = Thread(target=_processing_event, args=(event_queue,))
+    p.start()
+    print("subprocess started")
+
     app.run(host='0.0.0.0')
+    p.join()
 
 '''Slacker example
 # 메시지 전송 (#채널명, 내용)

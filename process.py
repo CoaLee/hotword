@@ -125,7 +125,9 @@ def process_search(keyword):
     # open_output_file.close()
 
     # cloud 이미지로 만들기
-    make_cloud_image_search(tags, keyword)
+    result_code = make_cloud_image_search(tags, keyword)
+    print("result_code 1: {}".format(result_code))
+    return result_code
 
 def make_cloud_image_search(tags, output_name):
     '''
@@ -138,6 +140,10 @@ def make_cloud_image_search(tags, output_name):
     #         word, count = data[0], float(data[1])
     #         word_to_count[word] = count
     # mask = np.array(Image.open("trump.png"))
+
+    print("wordcloud: {}".format(str(tags)))
+    if tags == {}:
+        return -1
 
     wordcloud = WordCloud(
         font_path=font_path,
@@ -154,6 +160,7 @@ def make_cloud_image_search(tags, output_name):
     # plt.show()
     fig.savefig("img_wordcloud/{0}.png".format('keyword_result'))
 
+    return 1
 
 # if __name__ == '__main__':
 #     process_main()
