@@ -13,7 +13,7 @@
 ## 2. Results
 |**뉴스 카테고리 검색**|**키워드 검색**|
 |---|---|
-|다음 뉴스 카테고리(사회, 정치, 경제, 국제, 문화, 스포츠, 연예, IT): 미리 크롤링한 데이터 활용|그 외 검색어에 대해서: 언론 사이트에 검색하여 크롤링|
+|다음 뉴스 카테고리: 다음 뉴스에서 미리 크롤링한 데이터 활용|그 외 검색어: 언론 사이트에 검색하여 크롤링|
 |![result_politics](https://github.com/CoaLee/hotword/blob/master/readme_data/result_politics.PNG)|![result_ssafy](https://github.com/CoaLee/hotword/blob/master/readme_data/result_ssafy.PNG)|
 
 ## 3. Structure & Functions
