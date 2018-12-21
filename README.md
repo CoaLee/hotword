@@ -15,7 +15,9 @@
 
 ## Results
 ![result_politics](https://github.com/CoaLee/hotword/readme_data/result_politics.PNG)
+
 ![result_ssafy](https://github.com/CoaLee/hotword/readme_data/result_ssafy.PNG)
+
 
 ## Challenge, TODO
 ### 주요한 기능
