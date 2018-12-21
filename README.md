@@ -14,8 +14,6 @@
 
 
 ## Results
-![result_IT](https://github.com/CoaLee/hotword/blob/master/readme_data/result_IT.PNG)
-![result_sonny](https://github.com/CoaLee/hotword/readme_data/result_sonny.PNG)
 ![result_politics](https://github.com/CoaLee/hotword/readme_data/result_politics.PNG)
 ![result_ssafy](https://github.com/CoaLee/hotword/readme_data/result_ssafy.PNG)
 
