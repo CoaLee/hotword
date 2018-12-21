@@ -14,7 +14,10 @@
 
 
 ## Results
-
+![result_IT](hotword/readme_data/result_IT.PNG)
+![result_sonny](hotword/readme_data/result_sonny.PNG)
+![result_politics](hotword/readme_data/result_politics.PNG)
+![result_ssafy](hotword/readme_data/result_ssafy.PNG)
 
 ## Challenge, TODO
 ### 주요한 기능
@@ -33,16 +36,16 @@
 
 ## Component: 
 ### Framework, API
-- Python Flask(Server)
-- Slack API(Bot)
-- DialogFlow(Query Interpretation)
+- Python Flask (Server)
+- Slack API (Bot)
+- DialogFlow (Query Interpretation)
 
 ### Library
 - BeautifulSoup4, Requests (Crawling)
-- Wordcloud, Matplotlib(Wordcloud Creation)
-- KoNLPy(Hangul Processing, Vocab Extraction)
+- Wordcloud, Matplotlib (Wordcloud Creation)
+- KoNLPy (Hangul Processing, Vocab Extraction)
 
 ### etc
-- Ngrok(Server Webhook)
-- Slacker(Slack Interaction)
+- Ngrok (Server Webhook)
+- Slacker (Slack Interaction)
 
