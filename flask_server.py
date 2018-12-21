@@ -1,4 +1,4 @@
-from flask import Flask, request, make_response
+from flask import Flask, request, make_response, render_template
 from slacker import Slacker
 import requests, json
 import process
@@ -18,7 +18,14 @@ slack = Slacker(token)
 
 @app.route('/')
 def index():
-    return "Hello, I'm ready"
+    result = 7
+    array = [
+        ['이용재', 24, 31, 55, 90],
+        ['지창규', 53, 53, 66, 80],
+        ['박준호', 42, 35, 87, 95]
+    ]
+    user_val = request.args.get('user_val')
+    return render_template('index.html', result=result, array=array, user_val = user_val)
 
 @app.route('/listening', methods=["GET", "POST"])
 def listening():

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1> Hello World from render Template </h1>
+
+{% if user_val %}
+사용자 값은 {{user_val}}
+<br>
+{% endif %}
+
+{% if result %}
+전달 받은 값은 {{result}}
+{% endif %}
+
+<h2> 반복문</h2>
+
+{% if array %}
+    {% for i in array %}
+<br>
+전달 받은 값은 {{i}}
+    {% endfor %}
+{% endif %}
+</body>
+</html>
