@@ -1,4 +1,4 @@
-# SSAFY startcamp week2 chatbot project
+# chatbot project
 
 ## 1. Design
 - **용도**: 뉴스 분야(정치, IT, 연예..) 또는 특정 키워드(손흥민, 삼성, ...)를 검색했을 때 연관된 단어들 보여준다.
